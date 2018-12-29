@@ -38,26 +38,32 @@ describe('GitHubAPI', () => {
       })
 
       nock('https://api.github.com')
-        .get('/repos/JasonEtco/pizza/issues?per_page=1').reply(200, issues[0], {
-          link: '<https://api.github.com/repositories/123/issues?per_page=1&page=2>; rel="next"'
+        .get('/repos/JasonEtco/pizza/issues?per_page=1&page=1')
+        .reply(200, issues[0], {
+          link: '<https://api.github.com/repos/JasonEtco/pizza/issues?per_page=1&page=2>; rel="next"'
         })
-        .get('/repositories/123/issues?per_page=1&page=2').reply(200, issues[1], {
-          link: '<https://api.github.com/repositories/123/issues?per_page=1&page=3>; rel="next"'
+        .get('/repos/JasonEtco/pizza/issues?per_page=1&page=2')
+        .reply(200, issues[1], {
+          link: '<https://api.github.com/repos/JasonEtco/pizza/issues?per_page=1&page=3>; rel="next"'
         })
-        .get('/repositories/123/issues?per_page=1&page=3').reply(200, issues[2], {
-          link: '<https://api.github.com/repositories/123/issues?per_page=1&page=4>; rel="next"'
+        .get('/repos/JasonEtco/pizza/issues?per_page=1&page=3')
+        .reply(200, issues[2], {
+          link: '<https://api.github.com/repos/JasonEtco/pizza/issues?per_page=1&page=4>; rel="next"'
         })
-        .get('/repositories/123/issues?per_page=1&page=4').reply(200, issues[3], {
-          link: '<https://api.github.com/repositories/123/issues?per_page=1&page=5>; rel="next"'
+        .get('/repos/JasonEtco/pizza/issues?per_page=1&page=4')
+        .reply(200, issues[3], {
+          link: '<https://api.github.com/repos/JasonEtco/pizza/issues?per_page=1&page=5>; rel="next"'
         })
-        .get('/repositories/123/issues?per_page=1&page=5').reply(200, issues[4], {
+        .get('/repos/JasonEtco/pizza/issues?per_page=1&page=5')
+        .reply(200, issues[4], {
           link: ''
         })
     })
 
-    it('returns an array of pages', async () => {
+    it.only('returns an array of pages', async () => {
       const spy = jest.fn()
-      const res = await github.paginate(github.issues.listForRepo({ owner: 'JasonEtco', repo: 'pizza', per_page: 1 }), spy)
+
+      const res = await github.paginate(github.issues.listForRepo.endpoint.merge({ owner: 'JasonEtco', repo: 'pizza', per_page: 1 }), spy)
       expect(Array.isArray(res)).toBeTruthy()
       expect(res.length).toBe(5)
       expect(spy).toHaveBeenCalledTimes(5)
